@@ -380,4 +380,167 @@ el(ns clojure-noob.core
   ;; under the clojure env we find that the seq is actually one of the most used
   ;; types since everything gets translated as a seq maps, sets lists and strings so
   ;; far seems to be items that can be transforced into seq
+
+  ;; One of the most important aspects of the abstraction is the sequence model
+  ;; a Sequence in clojure is defined as an ordered list of elements that respond
+  ;; to the 'first', 'rest' and 'cons' methods
+
+  ;; Example of Seq and functions.
+  (defn titleize
+    [topic]
+    (str topic " for the Brave and True"))
+  
+  ;; Same function but for a Vector
+  (map titleize ["Hamsters" "Ragnarok"])
+  
+  ;; Same function but for a list
+  (map titleize '("Empathy" "Decorating"))
+  
+  ;; Same function but for a sets
+  (map titleize #{"Elbows" "Soap Carving"})
+
+  ;; Same function but for a Hashmap
+  (map #(titleize (second %)) {:uncomfortable-thing "Winking"})
+
+  ;; Another cool way to work with maps is by passing multiple collections
+  (map str ["a" "b" "c"] ["A" "B" "C"])
+
+  ;; Snake Killings vs Knockouts
+  (def kill-consumption   [8.1 7.3 6.6 5.0])
+  (def ko-consumption [0.0 0.2 0.3 1.1])
+  (defn unify-kk-data
+    [kill ko]
+    {:kill kill
+    :ko ko})
+
+  (map unify-kk-data kill-consumption ko-consumption)
+
+  ;; map function can also take a collection of functions like
+  ;; in the next example
+  (def sum #(reduce + %))
+  (def avg #(/ (sum %) (count %)))
+  (defn stats
+    [numbers]
+    (map #(% numbers) [sum count avg]))
+
+  (stats [3 4 10])
+  (stats [80 1 44 13 6])
+
+  ;; map can also help retreive keys of a map definition
+  (def identities
+    [{:alias "Batman" :real "Bruce Wayne"}
+     {:alias "Spider-Man" :real "Peter Parker"}
+     {:alias "Santa" :real "Your mom"}
+     {:alias "Easter Bunny" :real "Your dad"}]
+  )
+  
+  (map :real identities)
+
+  ;; REDUCE
+  ;; reduce can be used to produce or associate map values
+  (reduce (fn 
+      [new-map [key val]]
+      (assoc new-map key (inc val))
+    )
+  {}
+  {:max 30 :min 10})
+
+  ;; it can also be used for filtering out keys in a map
+  ;; depending on it assigned value
+  (reduce (fn 
+      [new-map [key val]]
+      (if (> val 4)
+        (assoc new-map key val)
+        new-map
+      )
+    )
+    {}
+    {:human 4.1 :critter 3.9 :animal 5.0}
+  )
+
+  ;; TAKE, DROP, and DROP WHILE
+  ;; the take function takes the first n elements of a collection
+  (take 3 [1 2 3 4 5 6 7 8 9 10])
+
+  ;; drop returns the the sequence of elements after removing the first n elements
+  (drop 3 [1 2 3 4 5 6 7 8 9 10])
+
+  ;; Take and Drop While use a function to evaluate when to stop dropping or taking
+  (def food-journal
+    [{:month 1 :day 1 :human 5.3 :critter 2.3}
+     {:month 1 :day 2 :human 5.1 :critter 2.0}
+     {:month 2 :day 1 :human 4.9 :critter 2.1}
+     {:month 2 :day 2 :human 5.0 :critter 2.5}
+     {:month 3 :day 1 :human 4.2 :critter 3.3}
+     {:month 3 :day 2 :human 4.0 :critter 3.8}
+     {:month 4 :day 1 :human 3.7 :critter 3.9}
+     {:month 4 :day 2 :human 3.7 :critter 3.6}])
+  
+  ;; This function uses the anonymous function to determine if the month of the entry
+  ;; is less than 3
+  (take-while #(< (:month %) 3) food-journal)
+
+  ;; The same applies to drop while but it will return the elements until somehting tests truthfully
+  (drop-while #(< (:month %) 3) food-journal)
+
+  ;; We have to be careful since it seem that the function depends on the sort of th eelements
+  ;; so if there is an unordered element in the list we might be missing values
+  (take-while #(< (:month %) 4)
+            (drop-while #(< (:month %) 2) food-journal))
+
+  ;; Filter and Some
+  ;; use filter to return a seq of the elements that test positive to the condition passed
+  ;; to the filter
+  (filter #(< (:human %) 5) food-journal)
+
+  ;; the difference between filter and take or drop while is that the filter will examine
+  ;; the entire collection whereas drop or take will examine until the first value matches
+  ;; the condition so if we know the list is ordered then we should be able to use take or drop
+  ;; more efficiently since we don't have to examine the entire data set
+
+  ;; The some function will evaluate the data set and return the first item that it meets the collection
+  (some #(> (:critter %) 5) food-journal)
+  (some #(> (:critter %) 3) food-journal)
+
+  ;; The return value of some will be the result of the fucntion in the previous example it
+  ;; returned true or false since the function was boolean but in this case the function will
+  ;; return the actual entry of the map
+  (some #(and (> (:critter %) 3) %) food-journal)
+
+  ;; Sort and Sort By
+  ;; the sort functions allow you to sort elements if you need a more complex sorting mechanism
+  ;; you can use sort by to pass a function that will be used to sort the elements
+  (sort [3 1 2])
+  (sort-by count ["aaa" "c" "bb"])
+
+  ;; concat will append the memebers of one seq to another
+  (concat [1 2] [3 4])
+
+  ;; Lazy seq
+  ;; some of the function return lazy seq which means that are not realized (computed) until
+  ;; you want to access them
+
+  (def vampire-database
+    {0 {:makes-blood-puns? false, :has-pulse? true  :name "McFishwich"}
+     1 {:makes-blood-puns? false, :has-pulse? true  :name "McMackson"}
+     2 {:makes-blood-puns? true,  :has-pulse? false :name "Damon Salvatore"}
+     3 {:makes-blood-puns? true,  :has-pulse? true  :name "Mickey Mouse"}})
+
+  (defn vampire-related-details
+    [social-security-number]
+    (Thread/sleep 1000)
+    (get vampire-database social-security-number))
+
+  (defn vampire?
+    [record]
+    (and (:makes-blood-puns? record)
+      (not (:has-pulse? record))
+      record))
+
+  (defn identify-vampire
+    [social-security-numbers]
+    (first (filter vampire?
+      (map vampire-related-details social-security-numbers))))
+    
+
 )
