@@ -541,6 +541,51 @@ el(ns clojure-noob.core
     [social-security-numbers]
     (first (filter vampire?
       (map vampire-related-details social-security-numbers))))
-    
+  
+  ;; Lazy sequences are important in the next example it takes 1.1 secs to get data out from the DB
+  (time (vampire-related-details 0))
 
+  ;; But in this example it takes less time since we never reached to the DB
+  ;; the variable mapped details only returns a lazy seq of range 0 to 999999 without actually
+  ;; making the run to the DB until we want to access those records
+  (time (def mapped-details (map vampire-related-details (range 0 1000000))))
+  (time (first mapped-details))
+
+  (time (identify-vampire (range 0 1000000)))
+
+  ;; Infinite Sequences
+  ;; repeat will generate the passed value as a sequence indefinetetly
+  (concat (take 8 (repeat "na")) ["Batman!"])
+
+  ;; if we need a more robust repeat we can use repeatedly to
+  ;; to execute a function in order to repead the value
+  (take 3 (repeatedly (fn [] (rand-int 10))))
+
+  (defn even-numbers
+    ([] (even-numbers 0))
+    ([n] (cons n (lazy-seq (even-numbers (+ n 2))))))
+  
+  (take 10 (even-numbers))
+  
+  (cons 0 '(2 4 6))
+
+  ;; Into function allows us to transfor seq into their original values
+  ;; In the next example a map will be transformed into a seq thanks to 
+  ;; the map function and then transformed into a map again using the into function
+  (map identity {:sunlight-reaction "Glitter!"})
+  (into {} (map identity {:sunlight-reaction "Glitter!"}))
+
+  ;; Into can work with different types of data structures
+  (map identity [:garlic-clove :garlic-clove])
+  (into #{} (map identity [:garlic-clove :garlic-clove]))
+
+  ;; The first attribute of into doesn't have to be empty
+  ;; the next example is adding items into a map
+  (into {:favorite-emotion "gloomy"} [[:sunlight-reaction "Glitter!"]])
+  ;; and this into a vector
+  (into ["cherry"] '("pine" "spruce"))
+
+  ;; Also both arguments can be of the same type
+  (into {:favorite-animal "kitty"} {:least-favorite-smell "dog"
+                                    :relationship-with-teenager "creepy"})
 )
