@@ -549,5 +549,38 @@ el(ns clojure-noob.core
   (empty? [])
   (empty? ["no!"])
 
+  ;; INTO Method
+  ;; Some functions will return seq instead of the original values, once of the main uses of into is to
+  ;; transform the resulting seq into the original value
+  
+  ;; This first function will return a seq
+  (map identity {:sunlight-reaction "Glitter!"})
 
+  ;; We can use into to transform it back into a map
+  (into {} (map identity {:sunlight-reaction "Glitter!"}))
+
+  ;; Into works with other data structures as well
+  (map identity [:garlic :sesame-oil :fried-eggs])
+  
+  ;; This will convert it back into a vector
+  (into [] (map identity [:garlic :sesame-oil :fried-eggs]))
+
+  ;; From Vector
+  (map identity [:garlic-clove :garlic-clove])
+
+  ;; Into a set
+  (into #{} (map identity [:garlic-clove :garlic-clove]))
+
+  ;; Another important functionality is that we don't have to transform into a new empty vector or map
+  ;; the first argument of into doesn't have to be empty
+
+  ;; This example shows how we can add values to a map
+  (into {:favorite-emotion "gloomy"} [[:sunlight-reaction "Glitter!"]])
+
+  ;; And this into a Vector
+  (into ["cherry"] '("pine" "spruce"))
+
+  ;; finally both arguments can be of the same type
+  (into {:favorite-animal "kitty"} {:least-favorite-smell "dog" :relationship-with-teenager "creepy"})
+  
 )
