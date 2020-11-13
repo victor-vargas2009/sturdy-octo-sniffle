@@ -541,6 +541,13 @@ el(ns clojure-noob.core
     [social-security-numbers]
     (first (filter vampire?
       (map vampire-related-details social-security-numbers))))
-    
+  
+  ;; As with the seq abstraction where most of clojure individual elements can be represented as a sequence
+  ;; the collection abstraction applies similar principles but for the data structure as a whole
+  ;; With seq abstraction we can say that if we can call first, rest and cons then the structure implements sequence
+  ;; abstraction we can say that if we can call count, every?, empty? it implements the sequence abstraction
+  (empty? [])
+  (empty? ["no!"])
+
 
 )
