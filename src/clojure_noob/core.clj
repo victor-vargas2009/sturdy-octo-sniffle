@@ -582,5 +582,64 @@ el(ns clojure-noob.core
 
   ;; finally both arguments can be of the same type
   (into {:favorite-animal "kitty"} {:least-favorite-smell "dog" :relationship-with-teenager "creepy"})
+
+  ;;conj
+  ;; similarly to into conj adds elements to a collection but the difference is that into adds individual values
+  ;; conj will add entire collections as the next example will display
+  (conj [0] [1])
+
+  ;; if we want conj to work as into we need to pass the second argument as a scalar sigular value non vector
+  (conj [0] 1)
+
+  ;; We can add multiple value to conj and add all those to the collection
+  (conj [0] 1 2 3 4)
+
+  ;; it works with maps as well
+  (conj {:time "midnight"} [:place "ye olde cemetarium"])
+
+  ;; Conj and into are so similar that we could define conj with into as base
+  (defn my-conj
+    [target & additions]
+    (into target additions))
+  
+  (my-conj [0] 1 2 3)
+
+  ;; This is not unusual to see 2 function that provide the same result only differing in that
+  ;; one works with a rest parameter (conj) and one works with a seq data structure (into)
+
+  ;; apply
+  ;; This function explodes a seq data structure so that it can be passed to a function that expects the rest
+  ;; parameter
+
+  ;; An example can be seen using max
+  (max 0 1 2)
+
+  ;; Max can take any number of arguments but what if we want to find the max value within a collection
+  (max [0 1 2])
+
+  ;; This can be done as is because max is going to calculate the max of the collectionsss passed to the function
+  ;; and since we are just passing one then it doesn't work
+
+  ;; But if we use apply then we can find the max value of a collection
+  ;; by using apply we are basically obtaining individual values a passing those to the max function in 1 shot
+  (apply max [0 1 2])
+
+  ;; Similarly as we defined conj in the terms of into we can define into in the terms of conj by using apply
+  (defn my-into
+    [target additions]
+    (apply conj target additions))
+  
+  (my-into [0] [1 2 3])
+
+  (def add10 (partial + 10))
+  (add10 3) 
+  ; => 13
+  (add10 5) 
+  ; => 15
+
+  (def add-missing-elements
+    (partial conj ["water" "earth" "air"]))
+
+  (add-missing-elements "unobtainium" "adamantium")
   
 )
