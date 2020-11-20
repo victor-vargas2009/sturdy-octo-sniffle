@@ -541,7 +541,7 @@ el(ns clojure-noob.core
     [social-security-numbers]
     (first (filter vampire?
       (map vampire-related-details social-security-numbers))))
-  
+
   ;; Lazy sequences are important in the next example it takes 1.1 secs to get data out from the DB
   (time (vampire-related-details 0))
 
@@ -588,4 +588,121 @@ el(ns clojure-noob.core
   ;; Also both arguments can be of the same type
   (into {:favorite-animal "kitty"} {:least-favorite-smell "dog"
                                     :relationship-with-teenager "creepy"})
+
+  ;; As with the seq abstraction where most of clojure individual elements can be represented as a sequence
+  ;; the collection abstraction applies similar principles but for the data structure as a whole
+  ;; With seq abstraction we can say that if we can call first, rest and cons then the structure implements sequence
+  ;; abstraction we can say that if we can call count, every?, empty? it implements the sequence abstraction
+  (empty? [])
+  (empty? ["no!"])
+
+  ;; INTO Method
+  ;; Some functions will return seq instead of the original values, once of the main uses of into is to
+  ;; transform the resulting seq into the original value
+  
+  ;; This first function will return a seq
+  (map identity {:sunlight-reaction "Glitter!"})
+
+  ;; We can use into to transform it back into a map
+  (into {} (map identity {:sunlight-reaction "Glitter!"}))
+
+  ;; Into works with other data structures as well
+  (map identity [:garlic :sesame-oil :fried-eggs])
+  
+  ;; This will convert it back into a vector
+  (into [] (map identity [:garlic :sesame-oil :fried-eggs]))
+
+  ;; From Vector
+  (map identity [:garlic-clove :garlic-clove])
+
+  ;; Into a set
+  (into #{} (map identity [:garlic-clove :garlic-clove]))
+
+  ;; Another important functionality is that we don't have to transform into a new empty vector or map
+  ;; the first argument of into doesn't have to be empty
+
+  ;; This example shows how we can add values to a map
+  (into {:favorite-emotion "gloomy"} [[:sunlight-reaction "Glitter!"]])
+
+  ;; And this into a Vector
+  (into ["cherry"] '("pine" "spruce"))
+
+  ;; finally both arguments can be of the same type
+  (into {:favorite-animal "kitty"} {:least-favorite-smell "dog" :relationship-with-teenager "creepy"})
+
+  ;;conj
+  ;; similarly to into conj adds elements to a collection but the difference is that into adds individual values
+  ;; conj will add entire collections as the next example will display
+  (conj [0] [1])
+
+  ;; if we want conj to work as into we need to pass the second argument as a scalar sigular value non vector
+  (conj [0] 1)
+
+  ;; We can add multiple value to conj and add all those to the collection
+  (conj [0] 1 2 3 4)
+
+  ;; it works with maps as well
+  (conj {:time "midnight"} [:place "ye olde cemetarium"])
+
+  ;; Conj and into are so similar that we could define conj with into as base
+  (defn my-conj
+    [target & additions]
+    (into target additions))
+  
+  (my-conj [0] 1 2 3)
+
+  ;; This is not unusual to see 2 function that provide the same result only differing in that
+  ;; one works with a rest parameter (conj) and one works with a seq data structure (into)
+
+  ;; apply
+  ;; This function explodes a seq data structure so that it can be passed to a function that expects the rest
+  ;; parameter
+
+  ;; An example can be seen using max
+  (max 0 1 2)
+
+  ;; Max can take any number of arguments but what if we want to find the max value within a collection
+  (max [0 1 2])
+
+  ;; This can be done as is because max is going to calculate the max of the collectionsss passed to the function
+  ;; and since we are just passing one then it doesn't work
+
+  ;; But if we use apply then we can find the max value of a collection
+  ;; by using apply we are basically obtaining individual values a passing those to the max function in 1 shot
+  (apply max [0 1 2])
+
+  ;; Similarly as we defined conj in the terms of into we can define into in the terms of conj by using apply
+  (defn my-into
+    [target additions]
+    (apply conj target additions))
+  
+  (my-into [0] [1 2 3])
+
+  ;; PARTIAL
+  ;; a partial is a function that accepts a function and returns another function when you call your new function it calls the original with 
+  ;; the pre defined arguments and the passed arguments
+
+  ;; in this case the funtion add10 defines a partial where the passed function is  "+" and a pre defined argument of 10
+  (def add10 (partial + 10))
+
+  ;;when we call add 10 it will execute the + function on the pre defined arguments with the new arguments
+  (add10 3) 
+  ; => 13
+  (add10 5) 
+  ; => 15
+
+  (def add-missing-elements
+    (partial conj ["water" "earth" "air"]))
+
+  (add-missing-elements "unobtainium" "adamantium")
+
+  (defn lousy-logger
+    [log-level message]
+    (condp = log-level
+      :warn (clojure.string/lower-case message)
+      :emergency (clojure.string/upper-case message)))
+  
+  (def warn (partial lousy-logger :warn))
+  
+  (warn "Red light ahead")
 )
